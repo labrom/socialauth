@@ -32,6 +32,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -370,4 +371,29 @@ public class OAuth2 implements OAuthStrategyBase {
 	public AccessGrant getAccessGrant() {
 		return accessGrant;
 	}
+
+    @Override
+    public void read(String ns, Properties p) {
+        this.scope = p.getProperty(Prefix.withNs(ns, "scope"));
+        this.successUrl = p.getProperty(Prefix.withNs(ns, "successUrl"));
+        this.providerState = String.valueOf(true).equals(p.getProperty(Prefix.withNs(ns, "state")));
+        AccessGrant access = AccessGrant.fromProperties(Prefix.withNs(ns, "accessGrant"), p);
+        if(access != null) {
+            this.accessGrant = access;
+        }
+    }
+
+    @Override
+    public void write(String ns, Properties p) {
+        p.setProperty(Prefix.withNs(ns, "state"), String.valueOf(providerState));
+        if(scope != null) {
+            p.setProperty(Prefix.withNs(ns, "scope"), scope);
+        }
+        if(accessGrant != null) {
+            accessGrant.write(Prefix.withNs(ns, "accessGrant"), p);
+        }
+        if(successUrl != null) {
+            p.setProperty(Prefix.withNs(ns, "successUrl"), successUrl);
+        }
+    }
 }

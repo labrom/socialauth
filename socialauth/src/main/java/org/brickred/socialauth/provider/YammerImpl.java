@@ -76,7 +76,6 @@ public class YammerImpl extends AbstractProvider implements AuthProvider,
 	private String successUrl;
 	private boolean isVerify;
 	private OAuthConfig config;
-	private Permission scope;
 	private AccessGrant accessGrant;
 	private Profile userProfile;
 	private String profileId;

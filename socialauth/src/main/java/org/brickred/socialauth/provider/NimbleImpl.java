@@ -66,7 +66,6 @@ public class NimbleImpl extends AbstractProvider {
 	private static final Map<String, String> ENDPOINTS;
 	private final Log LOG = LogFactory.getLog(NimbleImpl.class);
 
-	private Permission scope;
 	private OAuthConfig config;
 	private AccessGrant accessGrant;
 	private OAuthStrategyBase authenticationStrategy;

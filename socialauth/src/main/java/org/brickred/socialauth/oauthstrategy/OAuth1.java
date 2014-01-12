@@ -27,10 +27,12 @@ package org.brickred.socialauth.oauthstrategy;
 
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.brickred.socialauth.Permission;
+import org.brickred.socialauth.SessionProperties;
 import org.brickred.socialauth.exception.ProviderStateException;
 import org.brickred.socialauth.exception.SocialAuthException;
 import org.brickred.socialauth.util.AccessGrant;
@@ -195,5 +197,40 @@ public class OAuth1 implements OAuthStrategyBase {
 	public AccessGrant getAccessGrant() {
 		return accessToken;
 	}
+
+    @Override
+    public void read(String ns, Properties p) {
+        this.providerState = String.valueOf(true).equals(p.getProperty(Prefix.withNs(ns, "state")));
+        this.scope = p.getProperty(Prefix.withNs(ns, "scope"));
+        String permissionScope = p.getProperty(Prefix.withNs(ns, "permission"));
+        if(permissionScope != null) {
+            this.permission = new Permission(permissionScope);
+        }
+        AccessGrant requestGrant = AccessGrant.fromProperties(Prefix.withNs(ns, "requestToken"), p);
+        if(requestGrant != null) {
+            this.requestToken = requestGrant;
+        }
+        AccessGrant accessGrant = AccessGrant.fromProperties(Prefix.withNs(ns, "accessToken"), p);
+        if(accessGrant != null) {
+            this.accessToken = accessGrant;
+        }
+    }
+
+    @Override
+    public void write(String ns, Properties p) {
+        p.setProperty(Prefix.withNs(ns, "state"), String.valueOf(providerState));
+        if(scope != null) {
+            p.setProperty(Prefix.withNs(ns, "scope"), scope);
+        }
+        if(permission != null) {
+            p.setProperty(Prefix.withNs(ns, "permission"), permission.getScope());
+        }
+        if(requestToken != null) {
+            requestToken.write(Prefix.withNs(ns, "requestToken"), p);
+        }
+        if(accessToken != null) {
+            accessToken.write(Prefix.withNs(ns, "accessToken"), p);
+        }
+    }
 
 }

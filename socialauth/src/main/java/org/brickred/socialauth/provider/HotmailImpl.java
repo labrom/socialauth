@@ -73,7 +73,6 @@ public class HotmailImpl extends AbstractProvider {
 	private static final Map<String, String> ENDPOINTS;
 	private final Log LOG = LogFactory.getLog(HotmailImpl.class);
 
-	private Permission scope;
 	private boolean isVerify;
 	private OAuthConfig config;
 	private Profile userProfile;

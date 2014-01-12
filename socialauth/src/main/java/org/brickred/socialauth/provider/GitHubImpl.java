@@ -26,11 +26,7 @@
 package org.brickred.socialauth.provider;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -64,7 +60,6 @@ public class GitHubImpl extends AbstractProvider {
 	private static final Map<String, String> ENDPOINTS;
 	private final Log LOG = LogFactory.getLog(this.getClass());
 
-	private Permission scope;
 	private OAuthConfig config;
 	private Profile userProfile;
 	private AccessGrant accessGrant;
@@ -222,7 +217,7 @@ public class GitHubImpl extends AbstractProvider {
 		authenticationStrategy.setScope(getScope());
 	}
 
-	@Override
+    @Override
 	public Response api(final String url, final String methodType,
 			final Map<String, String> params,
 			final Map<String, String> headerParams, final String body)

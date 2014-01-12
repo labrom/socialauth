@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -244,4 +245,33 @@ public class Hybrid implements OAuthStrategyBase {
 	public AccessGrant getAccessGrant() {
 		return accessToken;
 	}
+
+    @Override
+    public void read(String ns, Properties p) {
+        providerState = String.valueOf(true).equals(p.getProperty(Prefix.withNs(ns, "state")));
+        AccessGrant request = AccessGrant.fromProperties(Prefix.withNs(ns, "requestToken"), p);
+        if(request != null) {
+            requestToken = request;
+        }
+        AccessGrant access = AccessGrant.fromProperties(Prefix.withNs(ns, "accessToken"), p);
+        if(access != null) {
+            accessToken = request;
+        }
+        scope = p.getProperty(Prefix.withNs(ns, "scope"));
+    }
+
+    @Override
+    public void write(String ns, Properties p) {
+        p.setProperty(Prefix.withNs(ns, "state"), String.valueOf(providerState));
+        if(requestToken != null) {
+            requestToken.write(Prefix.withNs(ns, "requestToken"), p);
+        }
+        if(accessToken != null) {
+            accessToken.write(Prefix.withNs(ns, "accessToken"), p);
+        }
+        if(scope != null) {
+            p.setProperty(Prefix.withNs(ns, "scope"), scope);
+        }
+    }
+
 }

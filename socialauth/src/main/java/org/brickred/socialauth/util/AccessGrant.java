@@ -27,8 +27,12 @@ package org.brickred.socialauth.util;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import org.brickred.socialauth.Permission;
+import org.brickred.socialauth.SessionProperties;
 
 /**
  * Stores the keys and secret for OAuth access token as well as OAuth request
@@ -37,7 +41,7 @@ import org.brickred.socialauth.Permission;
  * @author tarunn@brickred.com
  * 
  */
-public class AccessGrant implements Serializable {
+public class AccessGrant implements Serializable, SessionProperties {
 
 	private static final long serialVersionUID = -7120362372191191930L;
 	private String key;
@@ -190,4 +194,67 @@ public class AccessGrant implements Serializable {
 		return result.toString();
 	}
 
+    @Override
+    public void read(String ns, Properties p) {
+        key = p.getProperty(Prefix.withNs(ns, "key"));
+        secret = p.getProperty(Prefix.withNs(ns, "secret"));
+        String attrs = p.getProperty(Prefix.withNs(ns, "attrs"));
+        if(attrs != null) {
+            for(String attr : Splitter.on(',').split(attrs)) {
+                Object val;
+                String strVal = p.getProperty(Prefix.withNs(ns, attr));
+                if(strVal.startsWith("boolean:")) {
+                    val = new Boolean(strVal.substring("boolean:".length()));
+                } else if(strVal.startsWith("long:")) {
+                    val = new Long(strVal.substring("long:".length()));
+                } else if(strVal.startsWith("int:")) {
+                    val = new Integer(strVal.substring("int:".length()));
+                } else {
+                    val = strVal;
+                }
+
+                setAttribute(attr, val);
+            }
+        }
+    }
+
+    @Override
+    public void write(String ns, Properties p) {
+        p.setProperty(Prefix.withNs(ns, "instance"), "yes");
+        if(key != null) {
+            p.setProperty(Prefix.withNs(ns, "key"), key);
+        }
+        if(secret != null) {
+            p.setProperty(Prefix.withNs(ns, "secret"), key);
+        }
+        if(_attributes != null) {
+            p.setProperty(Prefix.withNs(ns, "attrs"), Joiner.on(',').join(_attributes.keySet()));
+            for(Map.Entry<String, Object> e : _attributes.entrySet()) {
+                String strVal;
+                Object val = e.getValue();
+                if(val instanceof Boolean) {
+                    strVal = "boolean:";
+                } else if(val instanceof Long) {
+                    strVal = "long:";
+                } else if(val instanceof Integer) {
+                    strVal = "int:";
+                } else {
+                    strVal = "";
+                }
+                strVal += String.valueOf(val);
+                p.setProperty(Prefix.withNs(ns, e.getKey()), strVal);
+            }
+        }
+    }
+
+    public static AccessGrant fromProperties(String ns, Properties p) {
+        String instance = p.getProperty(Prefix.withNs(ns, "instance"));
+        if(instance == null)
+            return null;
+        AccessGrant grant = new AccessGrant();
+        grant.read(ns, p);
+        if(grant.key != null)
+            return grant;
+        return null;
+    }
 }

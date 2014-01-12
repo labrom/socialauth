@@ -66,7 +66,6 @@ public class SalesForceImpl extends AbstractProvider implements AuthProvider,
 	private final Log LOG = LogFactory.getLog(SalesForceImpl.class);
 
 	private OAuthConfig config;
-	private Permission scope;
 	private AccessGrant accessGrant;
 	private Profile userProfile;
 	private String profileURL;

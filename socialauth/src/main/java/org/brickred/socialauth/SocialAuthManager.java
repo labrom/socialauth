@@ -27,10 +27,7 @@ package org.brickred.socialauth;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,7 +45,7 @@ import org.brickred.socialauth.util.OAuthConfig;
  * @author tarunn@brickred.com
  * 
  */
-public class SocialAuthManager implements Serializable {
+public class SocialAuthManager implements Serializable, SessionProperties {
 
 	private static final long serialVersionUID = 1620459182486095613L;
 	private final Log LOG = LogFactory.getLog(SocialAuthManager.class);
@@ -379,4 +376,38 @@ public class SocialAuthManager implements Serializable {
 		permissionsMap.put(providerId, permission);
 	}
 
+    @Override
+    public void read(String ns, Properties p) {
+        providerId = p.getProperty("providerId");
+        currentProviderId = p.getProperty("currentProviderId");
+        try {
+            if(currentProviderId != null) {
+                authProvider = getProviderInstance(currentProviderId);
+                authProvider.read(currentProviderId, p);
+            } else if(providerId != null) {
+                authProvider = getProviderInstance(providerId);
+                authProvider.read(providerId, p);
+            }
+        } catch (SocialAuthConfigurationException e) {
+            // TODO
+        } catch (SocialAuthException e) {
+            // TODO
+        }
+        if(authProvider != null) {
+        }
+    }
+
+    @Override
+    public void write(String ns, Properties p) {
+        if(providerId != null) {
+            p.setProperty("providerId", providerId);
+        }
+        if(currentProviderId != null) {
+            p.setProperty("currentProviderId", currentProviderId);
+        }
+        if(authProvider != null) {
+            authProvider.write(authProvider.getProviderId(), p);
+        }
+        // TODO Write all providers?
+    }
 }

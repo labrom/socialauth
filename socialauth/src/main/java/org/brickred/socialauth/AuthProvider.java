@@ -52,7 +52,7 @@ import org.brickred.socialauth.util.Response;
  * 
  */
 
-public interface AuthProvider {
+public interface AuthProvider extends SessionProperties {
 
 	String EXT_NAMESPACE = "http://specs.openid.net/extensions/oauth/1.0";
 	String EMAIL = "email";

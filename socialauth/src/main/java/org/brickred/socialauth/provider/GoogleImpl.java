@@ -74,7 +74,6 @@ public class GoogleImpl extends AbstractProvider {
 	private static final Map<String, String> ENDPOINTS;
 	private final Log LOG = LogFactory.getLog(GoogleImpl.class);
 
-	private Permission scope;
 	private AccessGrant accessToken;
 	private OAuthConfig config;
 	private Profile userProfile;

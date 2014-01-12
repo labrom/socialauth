@@ -28,11 +28,7 @@ package org.brickred.socialauth.provider;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
@@ -80,7 +76,6 @@ public class TwitterImpl extends AbstractProvider implements AuthProvider,
 
 	private final Log LOG = LogFactory.getLog(TwitterImpl.class);
 
-	private Permission scope;
 	private boolean isVerify;
 	private AccessGrant accessToken;
 	private OAuthConfig config;
@@ -530,4 +525,17 @@ public class TwitterImpl extends AbstractProvider implements AuthProvider,
 	protected OAuthStrategyBase getOauthStrategy() {
 		return authenticationStrategy;
 	}
+
+    @Override
+    public void read(String ns, Properties p) {
+        isVerify = String.valueOf(true).equals(p.getProperty(Prefix.withNs(ns, "isVerify")));
+        super.read(ns, p);
+    }
+
+    @Override
+    public void write(String ns, Properties p) {
+        super.write(ns, p);
+        p.setProperty(Prefix.withNs(ns, "isVerify"), String.valueOf(isVerify));
+    }
+
 }

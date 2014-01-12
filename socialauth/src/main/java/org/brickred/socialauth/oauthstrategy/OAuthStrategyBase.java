@@ -30,10 +30,11 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.brickred.socialauth.Permission;
+import org.brickred.socialauth.SessionProperties;
 import org.brickred.socialauth.util.AccessGrant;
 import org.brickred.socialauth.util.Response;
 
-public interface OAuthStrategyBase extends Serializable {
+public interface OAuthStrategyBase extends Serializable, SessionProperties {
 
 	/**
 	 * It provides the URL which will be used for authentication with the

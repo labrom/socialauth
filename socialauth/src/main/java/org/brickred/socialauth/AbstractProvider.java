@@ -28,9 +28,11 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.brickred.socialauth.exception.AccessTokenExpireException;
 import org.brickred.socialauth.exception.SocialAuthException;
 import org.brickred.socialauth.oauthstrategy.OAuthStrategyBase;
 import org.brickred.socialauth.plugin.Plugin;
@@ -52,6 +54,8 @@ public abstract class AbstractProvider implements AuthProvider, Serializable {
 	private Map<Class<? extends Plugin>, Class<? extends Plugin>> pluginsMap;
 
 	private final Log LOG = LogFactory.getLog(this.getClass());
+
+    protected Permission scope;
 
 	public AbstractProvider() throws Exception {
 		pluginsMap = new HashMap<Class<? extends Plugin>, Class<? extends Plugin>>();
@@ -139,4 +143,40 @@ public abstract class AbstractProvider implements AuthProvider, Serializable {
 	 * @return OAuthStrategyBase of a provider.
 	 */
 	protected abstract OAuthStrategyBase getOauthStrategy();
+
+
+    @Override
+    public void read(String ns, Properties p) {
+        getOauthStrategy().read(Prefix.withNs(ns, "strategy"), p);
+        String scope = p.getProperty(Prefix.withNs(ns, "scope"));
+        if(scope != null) {
+            this.scope = new Permission(scope);
+            setPermission(this.scope);
+        }
+        AccessGrant grant = AccessGrant.fromProperties(Prefix.withNs(ns, "accessGrant"), p);
+        if(grant != null) {
+            try {
+                setAccessGrant(grant);
+            } catch (AccessTokenExpireException e) {
+                // TODO
+            } catch (SocialAuthException e) {
+                // TODO
+            }
+        }
+
+    }
+
+    @Override
+    public void write(String ns, Properties p) {
+        if(getAccessGrant() != null) {
+            getAccessGrant().write(Prefix.withNs(ns, "accessGrant"), p);
+        }
+        if(getOauthStrategy() != null) {
+            getOauthStrategy().write(Prefix.withNs(ns, "strategy"), p);
+        }
+        if(scope != null) {
+            p.setProperty(Prefix.withNs(ns, "scope"), scope.getScope());
+        }
+    }
+
 }
