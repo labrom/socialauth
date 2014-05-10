@@ -217,6 +217,23 @@ public class SocialAuthManager implements Serializable, SessionProperties {
 		return authProvider.getAccessGrant();
 	}
 
+	public AccessGrant createAccessGrant(final String providerId,
+			final Map<String, String> params, final String redirectURL)
+			throws Exception {
+		this.providerId = providerId;
+		if (socialAuthConfig == null) {
+			throw new SocialAuthConfigurationException(
+					"SocialAuth configuration is null.");
+		}
+		
+		if (providersMap.get(providerId) != null) {
+			authProvider = providersMap.get(providerId);
+		}
+		connect(params);
+		LOG.debug("Access Grant Object :: " + authProvider.getAccessGrant());
+		return authProvider.getAccessGrant();
+	}
+
 	/**
 	 * It disconnects with provider
 	 * 
